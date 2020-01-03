@@ -1,0 +1,41 @@
+The parser is in parser.y and the scanner is in scanner.l
+main.c traverses the scanner as tokens come in and decides what to print in binary.
+You may need to install yacc and flex.
+
+Just do make and then run ./opt testing.txt in cmd.
+If all goes well, you should have a single warning about yyparse.
+
+The final goal is to be able to get proper output for finaltest.txt
+
+Currently supported: 
+ADD
+ADDI
+AND
+ANDI
+LSL
+LSLI
+ASR
+ASRI
+EQL
+N Instructions
+
+Framework setup, need to write support in main.c:
+R and W Instructions
+Assembly sections: begin, end.
+
+
+Need to setup and write:
+More instructions
+Assembly Sections: word.
+comments.
+
+
+Bugs:
+If not sending the output anywhere in N Instructions, the assembler breaks.
+The address slot for targets is gibberish sometimes right now due to a malloc bug.
+
+Parts I need to read about in papers and figure out:
+Exactly what addresses for targets? Is it the offset from current? Absolute? Just the N[3] == target = 3? need to figure out.
+
+
+
