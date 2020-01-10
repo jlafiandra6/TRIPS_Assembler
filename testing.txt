@@ -1,1 +1,84 @@
-N[0] addi 7 N[0,0]
+.bbegin
+R[0]	read	G[2]	N[16,0]	N[16,1]		# bank3 reg 2 -> gpr 11
+N[0]	genu	1	N[1,0]			# Generate DSEG address assumed to be 0x10000000
+N[1]	slli	28	N[2,0]			# Finish generating DSeg address
+N[2]	mov4	N[3,0]	N[4,0]	N[5,0]	N[6,0]	# Distribute base address to memory loads
+N[3]	lw	0	0	W[0]
+N[4]	lw	1	4	W[1]
+N[5]	lw	2	8	W[2]
+N[6]	mov4	N[7,0]	N[8,0]	N[9,0]	N[10,0]
+N[7]	lw	3	12	W[3]
+N[8]	lw	4	16	W[4]
+N[9]	lw	5	20	W[5]
+N[10]	mov4	N[11,0]	N[12,0]	N[13,0]	N[14,0]
+N[11]	lw	6	24	W[6]
+N[12]	lw	7	28	W[7]
+N[13]	lw	8	32	W[8]
+N[14]	lw	9	36	W[9]
+N[15]	bro	0	2			# sequential branch
+N[16]	xor	W[10] ;
+W[0]	write	G[0]				# bank 0 reg 0 -> gpr 0
+W[1]	write	G[0] 				# bank 1 reg 0 -> gpr 1
+W[2]	write	G[0] 				# bank 2 reg 0 -> gpr 2
+W[3]	write	G[0] 				# bank 3 reg 0 -> gpr 3
+W[4]	write	G[1] 				# bank 0 reg 1 -> gpr 4
+W[5]	write	G[1] 				# bank 1 reg 1 -> gpr 5
+W[6]	write	G[1] 				# bank 2 reg 1 -> gpr 6
+W[7]	write	G[1] 				# bank 3 reg 1 -> gpr 7
+W[8]	write	G[2] 				# bank 0 reg 2 -> gpr 8
+W[9]	write	G[2] 				# bank 1 reg 2 -> gpr 9
+W[11]	write	G[2] 				# bank 3 reg 2 -> gpr 11
+.bbend
+
+.bbegin
+R[0]	read	G[0]	N[0,0]	N[2,0]		# bank 0 reg 0 -> gpr 0
+R[1]	read	G[0]	N[1,1]	N[3,0]		# bank1 reg 1 -> gpr 1
+R[3]	read	G[2]	N[6,0] ;			# bank 3 reg 2 -> gpr 11
+R[5]	read	G[0]	N[4,0] ;		# bank 1 reg 1 -> gpr 1
+N[0]	tgt	N[6,1]	N[1,0]			# swap if greater than
+N[1]	mov4	N[2,2]	N[3,2]	N[4,2]	N[5,2]
+# no swap
+N[2]	mov_f	W[0] ;			# First reg into G[0]
+N[3]	mov_f	N[7,0]	N[8,0]			# forward G[1] into next compare
+# swap
+N[4]	mov_t	W[0]	;			# Second reg into G[0]
+N[5]	mov_t	n[7,0]	N[8,0]			# forward G[0] into next compare
+N[6]	or	N[14,0]	;		# set if swap detected
+N[7]	mov	N[10,0]	N[13,0]			# First reg for next swap
+N[8]	tgt	N[14,1]	N[9,0]			# swap if greater than
+N[9]	mov4	N[10,2]	N[11,2]	N[12,2]	N[13,2]
+# no swap
+N[10]	mov_f	W[1]	;			# First reg into G[1]
+N[11]	mov_f	N[15,0]	N[16,0]			# forward second reg into next compare
+# swap
+N[12]	mov_t	W[1]	;			# Second reg into G[1]
+N[13]	mov_t	n[15,0]	N[16,0]			# forward first reg into next compare
+N[14]	or	N[22,0]	;			# set if swap detected
+N[15]	mov	N[18,0]	N[21,0]			# First reg for next swap
+N[16]	tgt	N[22,1]	N[17,0]			# swap if greater than
+N[17]	mov4	N[18,2]	N[19,2]	N[20,2]	N[21,2]
+# no swap
+N[18]	mov_f	W[2] ;				# First reg into G[2]
+N[19]	mov_f	N[23,0]	N[24,0]			# forward second reg into next compare
+# swap
+N[20]	mov_t	W[2] ;				# Second reg into G[2]
+N[21]	mov_t	n[23,0]	N[24,0]			# forward first reg into next compare
+N[22]	or	N[30,0]	;			# set if swap detected
+N[23]	mov	N[26,0]	N[29,0]			# First reg for next swap
+N[24]	tgt	N[30,1]	N[25,0]			# swap if greater than
+N[25]	mov4	N[26,2]	N[27,2]	N[28,2]	N[29,2]
+# no swap
+N[26]	mov_f	W[3] ;			# First reg into G[3]
+N[27]	mov_f	W[4] ;				# forward second reg into G[4]
+# swap
+N[28]	mov_t	W[3] ;				# Second reg into G[3]
+N[29]	mov_t	W[4] ;				# forward first reg into G[4]
+N[30]	or	W[5] ;			# set if swap detected and save in G[11]
+N[31]	bro	0	2			# sequential branch
+W[0]	write	G[0]				# bank 0 reg 0 -> gpr 0
+W[1]	write	G[0]				# bank 1 reg 0 -> gpr 1
+W[2]	write	G[0]				# bank 2 reg 0 -> gpr 2
+W[3]	write	G[0]				# bank 3 reg 0 -> gpr 3
+W[4]	write	G[1]				# bank 0 reg 1 -> gpr 4
+W[7]	write	G[2]				# bank 3 reg 2 -> gpr 11
+.bbend

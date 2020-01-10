@@ -1,19 +1,24 @@
+Useless nonterminals
+
+   label
+
+
 Terminals which are not used
 
    NOP
    COMMA
+   COLON
    POUND
    QUESTION
    LPAREN
    RPAREN
-   GREG
+   WLINE
+   LABEL
 
 
-State 1 conflicts: 3 shift/reduce
-State 3 conflicts: 3 shift/reduce
-State 5 conflicts: 3 shift/reduce
-State 7 conflicts: 3 shift/reduce
-State 9 conflicts: 3 shift/reduce
+Useless rules
+
+   37 label: LABEL COLON
 
 
 Grammar
@@ -22,14 +27,14 @@ Grammar
 
     1 start: insts
 
-    2 insts: insts inst
-    3      | inst
+    2 insts: inscounter inst insts
+    3      | END insts
+    4      | END
+    5      | ORIG insts
 
-    4 inst: label inst
-    5     | inscounter inst
-    6     | ORIG
-    7     | END
-    8     | ADD sendinst sendinst
+    6 inst: ADD sendinst sendinst
+    7     | XOR sendinst sendinst
+    8     | OR sendinst sendinst
     9     | ADDI IMM sendinst
    10     | AND sendinst sendinst
    11     | ANDI IMM sendinst
@@ -38,29 +43,35 @@ Grammar
    14     | ASR sendinst sendinst
    15     | ASRI IMM sendinst
    16     | EQL sendinst sendinst
-   17     | LW IMM sendinst
+   17     | LW IMM IMM sendinst
    18     | LB IMM sendinst
    19     | SW IMM sendinst
    20     | SB IMM sendinst
-   21     | BRO LABEL
+   21     | BRO IMM IMM
+   22     | GENU IMM sendinst
+   23     | READ GREG sendinst sendinst
+   24     | WRITE GREG
+   25     | MOV sendinst sendinst
+   26     | MOV4 sendinst sendinst sendinst sendinst
+   27     | MOVT sendinst sendinst
+   28     | MOVF sendinst sendinst
+   29     | TGT sendinst sendinst
 
-   22 label: LABEL COLON
+   30 inscounter: NLINE
+   31           | WINSTR
+   32           | SLINE
 
-   23 inscounter: NLINE
-   24           | WLINE
-   25           | SLINE
-
-   26 sendinst: /* empty */
-   27         | NINSTR
-   28         | WINSTR
-   29         | SINSTR
+   33 sendinst: NINSTR
+   34         | WINSTR
+   35         | SINSTR
+   36         | SEMICOLON
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-ADD (258) 8
+ADD (258) 6
 ADDI (259) 9
 AND (260) 10
 ANDI (261) 11
@@ -68,694 +79,949 @@ LSL (262) 12
 LSLI (263) 13
 ASR (264) 14
 ASRI (265) 15
-EQL (266) 16
-LW (267) 17
-LB (268) 18
-SW (269) 19
-SB (270) 20
-BRO (271) 21
-NOP (272)
-ORIG (273) 6
-END (274) 7
-COMMA (275)
-COLON (276) 22
-POUND (277)
-QUESTION (278)
-LPAREN (279)
-RPAREN (280)
-GREG (281)
-NINSTR (282) 27
-WINSTR (283) 28
-SINSTR (284) 29
-NLINE (285) 23
-WLINE (286) 24
-SLINE (287) 25
-IMM (288) 9 11 13 15 17 18 19 20
-LABEL (289) 21 22
+XOR (266) 7
+OR (267) 8
+EQL (268) 16
+LW (269) 17
+LB (270) 18
+SW (271) 19
+SB (272) 20
+BRO (273) 21
+NOP (274)
+GENU (275) 22
+READ (276) 23
+WRITE (277) 24
+MOV (278) 25
+MOV4 (279) 26
+MOVF (280) 28
+MOVT (281) 27
+TGT (282) 29
+ORIG (283) 5
+END (284) 3 4
+COMMA (285)
+COLON (286)
+POUND (287)
+QUESTION (288)
+LPAREN (289)
+RPAREN (290)
+GREG (291) 23 24
+NINSTR (292) 33
+WINSTR (293) 31 34
+SINSTR (294) 35
+SEMICOLON (295) 36
+NLINE (296) 30
+WLINE (297)
+SLINE (298) 32
+IMM (299) 9 11 13 15 17 18 19 20 21 22
+LABEL (300)
 
 
 Nonterminals, with rules where they appear
 
-$accept (35)
+$accept (46)
     on left: 0
-start (36)
+start (47)
     on left: 1, on right: 0
-insts (37)
-    on left: 2 3, on right: 1 2
-inst (38)
-    on left: 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21,
-    on right: 2 3 4 5
-label (39)
-    on left: 22, on right: 4
-inscounter (40)
-    on left: 23 24 25, on right: 5
-sendinst (41)
-    on left: 26 27 28 29, on right: 8 9 10 11 12 13 14 15 16 17 18
-    19 20
+insts (48)
+    on left: 2 3 4 5, on right: 1 2 3 5
+inst (49)
+    on left: 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+    26 27 28 29, on right: 2
+inscounter (50)
+    on left: 30 31 32, on right: 2
+sendinst (51)
+    on left: 33 34 35 36, on right: 6 7 8 9 10 11 12 13 14 15 16 17
+    18 19 20 22 23 25 26 27 28 29
 
 
 state 0
 
     0 $accept: . start $end
 
-    ADD    shift, and go to state 1
-    ADDI   shift, and go to state 2
-    AND    shift, and go to state 3
-    ANDI   shift, and go to state 4
-    LSL    shift, and go to state 5
-    LSLI   shift, and go to state 6
-    ASR    shift, and go to state 7
-    ASRI   shift, and go to state 8
-    EQL    shift, and go to state 9
-    LW     shift, and go to state 10
-    LB     shift, and go to state 11
-    SW     shift, and go to state 12
-    SB     shift, and go to state 13
-    BRO    shift, and go to state 14
-    ORIG   shift, and go to state 15
-    END    shift, and go to state 16
-    NLINE  shift, and go to state 17
-    WLINE  shift, and go to state 18
-    SLINE  shift, and go to state 19
-    LABEL  shift, and go to state 20
+    ORIG    shift, and go to state 1
+    END     shift, and go to state 2
+    WINSTR  shift, and go to state 3
+    NLINE   shift, and go to state 4
+    SLINE   shift, and go to state 5
 
-    start       go to state 21
-    insts       go to state 22
-    inst        go to state 23
-    label       go to state 24
-    inscounter  go to state 25
+    start       go to state 6
+    insts       go to state 7
+    inscounter  go to state 8
 
 
 state 1
 
-    8 inst: ADD . sendinst sendinst
+    5 insts: ORIG . insts
 
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
+    ORIG    shift, and go to state 1
+    END     shift, and go to state 2
+    WINSTR  shift, and go to state 3
+    NLINE   shift, and go to state 4
+    SLINE   shift, and go to state 5
 
-    NINSTR    [reduce using rule 26 (sendinst)]
-    WINSTR    [reduce using rule 26 (sendinst)]
-    SINSTR    [reduce using rule 26 (sendinst)]
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 29
+    insts       go to state 9
+    inscounter  go to state 8
 
 
 state 2
 
-    9 inst: ADDI . IMM sendinst
+    3 insts: END . insts
+    4      | END .
 
-    IMM  shift, and go to state 30
+    ORIG    shift, and go to state 1
+    END     shift, and go to state 2
+    WINSTR  shift, and go to state 3
+    NLINE   shift, and go to state 4
+    SLINE   shift, and go to state 5
+
+    $default  reduce using rule 4 (insts)
+
+    insts       go to state 10
+    inscounter  go to state 8
 
 
 state 3
 
-   10 inst: AND . sendinst sendinst
+   31 inscounter: WINSTR .
 
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    NINSTR    [reduce using rule 26 (sendinst)]
-    WINSTR    [reduce using rule 26 (sendinst)]
-    SINSTR    [reduce using rule 26 (sendinst)]
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 31
+    $default  reduce using rule 31 (inscounter)
 
 
 state 4
 
-   11 inst: ANDI . IMM sendinst
+   30 inscounter: NLINE .
 
-    IMM  shift, and go to state 32
+    $default  reduce using rule 30 (inscounter)
 
 
 state 5
 
-   12 inst: LSL . sendinst sendinst
+   32 inscounter: SLINE .
 
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    NINSTR    [reduce using rule 26 (sendinst)]
-    WINSTR    [reduce using rule 26 (sendinst)]
-    SINSTR    [reduce using rule 26 (sendinst)]
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 33
+    $default  reduce using rule 32 (inscounter)
 
 
 state 6
 
-   13 inst: LSLI . IMM sendinst
+    0 $accept: start . $end
 
-    IMM  shift, and go to state 34
+    $end  shift, and go to state 11
 
 
 state 7
 
-   14 inst: ASR . sendinst sendinst
+    1 start: insts .
 
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    NINSTR    [reduce using rule 26 (sendinst)]
-    WINSTR    [reduce using rule 26 (sendinst)]
-    SINSTR    [reduce using rule 26 (sendinst)]
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 35
+    $default  reduce using rule 1 (start)
 
 
 state 8
 
-   15 inst: ASRI . IMM sendinst
+    2 insts: inscounter . inst insts
 
-    IMM  shift, and go to state 36
+    ADD    shift, and go to state 12
+    ADDI   shift, and go to state 13
+    AND    shift, and go to state 14
+    ANDI   shift, and go to state 15
+    LSL    shift, and go to state 16
+    LSLI   shift, and go to state 17
+    ASR    shift, and go to state 18
+    ASRI   shift, and go to state 19
+    XOR    shift, and go to state 20
+    OR     shift, and go to state 21
+    EQL    shift, and go to state 22
+    LW     shift, and go to state 23
+    LB     shift, and go to state 24
+    SW     shift, and go to state 25
+    SB     shift, and go to state 26
+    BRO    shift, and go to state 27
+    GENU   shift, and go to state 28
+    READ   shift, and go to state 29
+    WRITE  shift, and go to state 30
+    MOV    shift, and go to state 31
+    MOV4   shift, and go to state 32
+    MOVF   shift, and go to state 33
+    MOVT   shift, and go to state 34
+    TGT    shift, and go to state 35
+
+    inst  go to state 36
 
 
 state 9
 
-   16 inst: EQL . sendinst sendinst
+    5 insts: ORIG insts .
 
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    NINSTR    [reduce using rule 26 (sendinst)]
-    WINSTR    [reduce using rule 26 (sendinst)]
-    SINSTR    [reduce using rule 26 (sendinst)]
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 37
+    $default  reduce using rule 5 (insts)
 
 
 state 10
 
-   17 inst: LW . IMM sendinst
-
-    IMM  shift, and go to state 38
-
-
-state 11
-
-   18 inst: LB . IMM sendinst
-
-    IMM  shift, and go to state 39
-
-
-state 12
-
-   19 inst: SW . IMM sendinst
-
-    IMM  shift, and go to state 40
-
-
-state 13
-
-   20 inst: SB . IMM sendinst
-
-    IMM  shift, and go to state 41
-
-
-state 14
-
-   21 inst: BRO . LABEL
-
-    LABEL  shift, and go to state 42
-
-
-state 15
-
-    6 inst: ORIG .
-
-    $default  reduce using rule 6 (inst)
-
-
-state 16
-
-    7 inst: END .
-
-    $default  reduce using rule 7 (inst)
-
-
-state 17
-
-   23 inscounter: NLINE .
-
-    $default  reduce using rule 23 (inscounter)
-
-
-state 18
-
-   24 inscounter: WLINE .
-
-    $default  reduce using rule 24 (inscounter)
-
-
-state 19
-
-   25 inscounter: SLINE .
-
-    $default  reduce using rule 25 (inscounter)
-
-
-state 20
-
-   22 label: LABEL . COLON
-
-    COLON  shift, and go to state 43
-
-
-state 21
-
-    0 $accept: start . $end
-
-    $end  shift, and go to state 44
-
-
-state 22
-
-    1 start: insts .
-    2 insts: insts . inst
-
-    ADD    shift, and go to state 1
-    ADDI   shift, and go to state 2
-    AND    shift, and go to state 3
-    ANDI   shift, and go to state 4
-    LSL    shift, and go to state 5
-    LSLI   shift, and go to state 6
-    ASR    shift, and go to state 7
-    ASRI   shift, and go to state 8
-    EQL    shift, and go to state 9
-    LW     shift, and go to state 10
-    LB     shift, and go to state 11
-    SW     shift, and go to state 12
-    SB     shift, and go to state 13
-    BRO    shift, and go to state 14
-    ORIG   shift, and go to state 15
-    END    shift, and go to state 16
-    NLINE  shift, and go to state 17
-    WLINE  shift, and go to state 18
-    SLINE  shift, and go to state 19
-    LABEL  shift, and go to state 20
-
-    $default  reduce using rule 1 (start)
-
-    inst        go to state 45
-    label       go to state 24
-    inscounter  go to state 25
-
-
-state 23
-
-    3 insts: inst .
+    3 insts: END insts .
 
     $default  reduce using rule 3 (insts)
 
 
-state 24
-
-    4 inst: label . inst
-
-    ADD    shift, and go to state 1
-    ADDI   shift, and go to state 2
-    AND    shift, and go to state 3
-    ANDI   shift, and go to state 4
-    LSL    shift, and go to state 5
-    LSLI   shift, and go to state 6
-    ASR    shift, and go to state 7
-    ASRI   shift, and go to state 8
-    EQL    shift, and go to state 9
-    LW     shift, and go to state 10
-    LB     shift, and go to state 11
-    SW     shift, and go to state 12
-    SB     shift, and go to state 13
-    BRO    shift, and go to state 14
-    ORIG   shift, and go to state 15
-    END    shift, and go to state 16
-    NLINE  shift, and go to state 17
-    WLINE  shift, and go to state 18
-    SLINE  shift, and go to state 19
-    LABEL  shift, and go to state 20
-
-    inst        go to state 46
-    label       go to state 24
-    inscounter  go to state 25
-
-
-state 25
-
-    5 inst: inscounter . inst
-
-    ADD    shift, and go to state 1
-    ADDI   shift, and go to state 2
-    AND    shift, and go to state 3
-    ANDI   shift, and go to state 4
-    LSL    shift, and go to state 5
-    LSLI   shift, and go to state 6
-    ASR    shift, and go to state 7
-    ASRI   shift, and go to state 8
-    EQL    shift, and go to state 9
-    LW     shift, and go to state 10
-    LB     shift, and go to state 11
-    SW     shift, and go to state 12
-    SB     shift, and go to state 13
-    BRO    shift, and go to state 14
-    ORIG   shift, and go to state 15
-    END    shift, and go to state 16
-    NLINE  shift, and go to state 17
-    WLINE  shift, and go to state 18
-    SLINE  shift, and go to state 19
-    LABEL  shift, and go to state 20
-
-    inst        go to state 47
-    label       go to state 24
-    inscounter  go to state 25
-
-
-state 26
-
-   27 sendinst: NINSTR .
-
-    $default  reduce using rule 27 (sendinst)
-
-
-state 27
-
-   28 sendinst: WINSTR .
-
-    $default  reduce using rule 28 (sendinst)
-
-
-state 28
-
-   29 sendinst: SINSTR .
-
-    $default  reduce using rule 29 (sendinst)
-
-
-state 29
-
-    8 inst: ADD sendinst . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 48
-
-
-state 30
-
-    9 inst: ADDI IMM . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 49
-
-
-state 31
-
-   10 inst: AND sendinst . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 50
-
-
-state 32
-
-   11 inst: ANDI IMM . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 51
-
-
-state 33
-
-   12 inst: LSL sendinst . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 52
-
-
-state 34
-
-   13 inst: LSLI IMM . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 53
-
-
-state 35
-
-   14 inst: ASR sendinst . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 54
-
-
-state 36
-
-   15 inst: ASRI IMM . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 55
-
-
-state 37
-
-   16 inst: EQL sendinst . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 56
-
-
-state 38
-
-   17 inst: LW IMM . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 57
-
-
-state 39
-
-   18 inst: LB IMM . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 58
-
-
-state 40
-
-   19 inst: SW IMM . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 59
-
-
-state 41
-
-   20 inst: SB IMM . sendinst
-
-    NINSTR  shift, and go to state 26
-    WINSTR  shift, and go to state 27
-    SINSTR  shift, and go to state 28
-
-    $default  reduce using rule 26 (sendinst)
-
-    sendinst  go to state 60
-
-
-state 42
-
-   21 inst: BRO LABEL .
-
-    $default  reduce using rule 21 (inst)
-
-
-state 43
-
-   22 label: LABEL COLON .
-
-    $default  reduce using rule 22 (label)
-
-
-state 44
+state 11
 
     0 $accept: start $end .
 
     $default  accept
 
 
+state 12
+
+    6 inst: ADD . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 41
+
+
+state 13
+
+    9 inst: ADDI . IMM sendinst
+
+    IMM  shift, and go to state 42
+
+
+state 14
+
+   10 inst: AND . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 43
+
+
+state 15
+
+   11 inst: ANDI . IMM sendinst
+
+    IMM  shift, and go to state 44
+
+
+state 16
+
+   12 inst: LSL . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 45
+
+
+state 17
+
+   13 inst: LSLI . IMM sendinst
+
+    IMM  shift, and go to state 46
+
+
+state 18
+
+   14 inst: ASR . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 47
+
+
+state 19
+
+   15 inst: ASRI . IMM sendinst
+
+    IMM  shift, and go to state 48
+
+
+state 20
+
+    7 inst: XOR . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 49
+
+
+state 21
+
+    8 inst: OR . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 50
+
+
+state 22
+
+   16 inst: EQL . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 51
+
+
+state 23
+
+   17 inst: LW . IMM IMM sendinst
+
+    IMM  shift, and go to state 52
+
+
+state 24
+
+   18 inst: LB . IMM sendinst
+
+    IMM  shift, and go to state 53
+
+
+state 25
+
+   19 inst: SW . IMM sendinst
+
+    IMM  shift, and go to state 54
+
+
+state 26
+
+   20 inst: SB . IMM sendinst
+
+    IMM  shift, and go to state 55
+
+
+state 27
+
+   21 inst: BRO . IMM IMM
+
+    IMM  shift, and go to state 56
+
+
+state 28
+
+   22 inst: GENU . IMM sendinst
+
+    IMM  shift, and go to state 57
+
+
+state 29
+
+   23 inst: READ . GREG sendinst sendinst
+
+    GREG  shift, and go to state 58
+
+
+state 30
+
+   24 inst: WRITE . GREG
+
+    GREG  shift, and go to state 59
+
+
+state 31
+
+   25 inst: MOV . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 60
+
+
+state 32
+
+   26 inst: MOV4 . sendinst sendinst sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 61
+
+
+state 33
+
+   28 inst: MOVF . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 62
+
+
+state 34
+
+   27 inst: MOVT . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 63
+
+
+state 35
+
+   29 inst: TGT . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 64
+
+
+state 36
+
+    2 insts: inscounter inst . insts
+
+    ORIG    shift, and go to state 1
+    END     shift, and go to state 2
+    WINSTR  shift, and go to state 3
+    NLINE   shift, and go to state 4
+    SLINE   shift, and go to state 5
+
+    insts       go to state 65
+    inscounter  go to state 8
+
+
+state 37
+
+   33 sendinst: NINSTR .
+
+    $default  reduce using rule 33 (sendinst)
+
+
+state 38
+
+   34 sendinst: WINSTR .
+
+    $default  reduce using rule 34 (sendinst)
+
+
+state 39
+
+   35 sendinst: SINSTR .
+
+    $default  reduce using rule 35 (sendinst)
+
+
+state 40
+
+   36 sendinst: SEMICOLON .
+
+    $default  reduce using rule 36 (sendinst)
+
+
+state 41
+
+    6 inst: ADD sendinst . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 66
+
+
+state 42
+
+    9 inst: ADDI IMM . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 67
+
+
+state 43
+
+   10 inst: AND sendinst . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 68
+
+
+state 44
+
+   11 inst: ANDI IMM . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 69
+
+
 state 45
 
-    2 insts: insts inst .
+   12 inst: LSL sendinst . sendinst
 
-    $default  reduce using rule 2 (insts)
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 70
 
 
 state 46
 
-    4 inst: label inst .
+   13 inst: LSLI IMM . sendinst
 
-    $default  reduce using rule 4 (inst)
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 71
 
 
 state 47
 
-    5 inst: inscounter inst .
+   14 inst: ASR sendinst . sendinst
 
-    $default  reduce using rule 5 (inst)
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 72
 
 
 state 48
 
-    8 inst: ADD sendinst sendinst .
+   15 inst: ASRI IMM . sendinst
 
-    $default  reduce using rule 8 (inst)
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 73
 
 
 state 49
+
+    7 inst: XOR sendinst . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 74
+
+
+state 50
+
+    8 inst: OR sendinst . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 75
+
+
+state 51
+
+   16 inst: EQL sendinst . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 76
+
+
+state 52
+
+   17 inst: LW IMM . IMM sendinst
+
+    IMM  shift, and go to state 77
+
+
+state 53
+
+   18 inst: LB IMM . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 78
+
+
+state 54
+
+   19 inst: SW IMM . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 79
+
+
+state 55
+
+   20 inst: SB IMM . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 80
+
+
+state 56
+
+   21 inst: BRO IMM . IMM
+
+    IMM  shift, and go to state 81
+
+
+state 57
+
+   22 inst: GENU IMM . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 82
+
+
+state 58
+
+   23 inst: READ GREG . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 83
+
+
+state 59
+
+   24 inst: WRITE GREG .
+
+    $default  reduce using rule 24 (inst)
+
+
+state 60
+
+   25 inst: MOV sendinst . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 84
+
+
+state 61
+
+   26 inst: MOV4 sendinst . sendinst sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 85
+
+
+state 62
+
+   28 inst: MOVF sendinst . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 86
+
+
+state 63
+
+   27 inst: MOVT sendinst . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 87
+
+
+state 64
+
+   29 inst: TGT sendinst . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 88
+
+
+state 65
+
+    2 insts: inscounter inst insts .
+
+    $default  reduce using rule 2 (insts)
+
+
+state 66
+
+    6 inst: ADD sendinst sendinst .
+
+    $default  reduce using rule 6 (inst)
+
+
+state 67
 
     9 inst: ADDI IMM sendinst .
 
     $default  reduce using rule 9 (inst)
 
 
-state 50
+state 68
 
    10 inst: AND sendinst sendinst .
 
     $default  reduce using rule 10 (inst)
 
 
-state 51
+state 69
 
    11 inst: ANDI IMM sendinst .
 
     $default  reduce using rule 11 (inst)
 
 
-state 52
+state 70
 
    12 inst: LSL sendinst sendinst .
 
     $default  reduce using rule 12 (inst)
 
 
-state 53
+state 71
 
    13 inst: LSLI IMM sendinst .
 
     $default  reduce using rule 13 (inst)
 
 
-state 54
+state 72
 
    14 inst: ASR sendinst sendinst .
 
     $default  reduce using rule 14 (inst)
 
 
-state 55
+state 73
 
    15 inst: ASRI IMM sendinst .
 
     $default  reduce using rule 15 (inst)
 
 
-state 56
+state 74
+
+    7 inst: XOR sendinst sendinst .
+
+    $default  reduce using rule 7 (inst)
+
+
+state 75
+
+    8 inst: OR sendinst sendinst .
+
+    $default  reduce using rule 8 (inst)
+
+
+state 76
 
    16 inst: EQL sendinst sendinst .
 
     $default  reduce using rule 16 (inst)
 
 
-state 57
+state 77
 
-   17 inst: LW IMM sendinst .
+   17 inst: LW IMM IMM . sendinst
 
-    $default  reduce using rule 17 (inst)
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 89
 
 
-state 58
+state 78
 
    18 inst: LB IMM sendinst .
 
     $default  reduce using rule 18 (inst)
 
 
-state 59
+state 79
 
    19 inst: SW IMM sendinst .
 
     $default  reduce using rule 19 (inst)
 
 
-state 60
+state 80
 
    20 inst: SB IMM sendinst .
 
     $default  reduce using rule 20 (inst)
+
+
+state 81
+
+   21 inst: BRO IMM IMM .
+
+    $default  reduce using rule 21 (inst)
+
+
+state 82
+
+   22 inst: GENU IMM sendinst .
+
+    $default  reduce using rule 22 (inst)
+
+
+state 83
+
+   23 inst: READ GREG sendinst . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 90
+
+
+state 84
+
+   25 inst: MOV sendinst sendinst .
+
+    $default  reduce using rule 25 (inst)
+
+
+state 85
+
+   26 inst: MOV4 sendinst sendinst . sendinst sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 91
+
+
+state 86
+
+   28 inst: MOVF sendinst sendinst .
+
+    $default  reduce using rule 28 (inst)
+
+
+state 87
+
+   27 inst: MOVT sendinst sendinst .
+
+    $default  reduce using rule 27 (inst)
+
+
+state 88
+
+   29 inst: TGT sendinst sendinst .
+
+    $default  reduce using rule 29 (inst)
+
+
+state 89
+
+   17 inst: LW IMM IMM sendinst .
+
+    $default  reduce using rule 17 (inst)
+
+
+state 90
+
+   23 inst: READ GREG sendinst sendinst .
+
+    $default  reduce using rule 23 (inst)
+
+
+state 91
+
+   26 inst: MOV4 sendinst sendinst sendinst . sendinst
+
+    NINSTR     shift, and go to state 37
+    WINSTR     shift, and go to state 38
+    SINSTR     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+
+    sendinst  go to state 92
+
+
+state 92
+
+   26 inst: MOV4 sendinst sendinst sendinst sendinst .
+
+    $default  reduce using rule 26 (inst)

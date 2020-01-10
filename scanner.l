@@ -13,8 +13,10 @@
 [aA][dD][dD][iI]       { return ADDI;  }
 [aA][nN][dD]           { return AND;  }
 [aA][nN][dD][iI]       { return ANDI; }
-[lL][sS][lL]			{ return LSL; }
-[lL][sS][lL][iI]		{ return LSLI; }
+[xX][oO][rR]			{return XOR;  }
+[oO][rR]			    {return OR;  }
+[sS][lL][lL]			{ return LSL; }
+[sS][lL][lL][iI]		{ return LSLI; }
 [aA][sS][rR][iI]		{ return ASRI; }
 [aA][sS][rR]			{ return ASR; }
 [eE][qQ][lL]			{ return EQL; }
@@ -24,17 +26,28 @@
 [sS][bB]				{ return SB; }
 [bB][rR][oO]	       { return BRO;  } 
 [nN][oO][pP]           { return NOP;  }
-"."[bB][bB][eE][gG][iI][nN] { return ORIG;  }
+[gG][eE][nN][uU]      { return GENU;  }
+[rR][eE][aA][dD]         { return READ;  }
+[wW][rR][iI][tT][eE]       { return WRITE;  }
+[mM][oO][vV]				{return MOV;   }
+[mM][oO][vV][4]				{return MOV4;   }
+[mM][oO][vV][_][fF]			{return MOVF;   }
+[mM][oO][vV][_][tT]				{return MOVT;   }
+[tT][gG][tT]				{return TGT;   }
+"."[bB][bB][eE][gG][iI][nN] { return ORIG; }
 "."[bB][bB][eE][nN][dD]   { return END;}
 ","                    { return COMMA; }
 ":"                    { return COLON; }
+";"                    { 
+						yylval.strPtr = (char *) strcpy(malloc(strlen(yytext)+1),yytext); 
+						return SEMICOLON; }
 "#"                    { return POUND; }
 "?"					{ return QUESTION; }
 "("					{ return LPAREN; }
 ")"					{ return RPAREN; }
 
 [G]"["[0-9]+"]"        { yytext[strlen(yytext)-1] = 0;
-						yylval.val = atoi(yytext + 2);
+						 yylval.val = atoi(yytext + 2);
                          return GREG;
                        }
                        
@@ -42,7 +55,7 @@
                          return NINSTR; 
                        }
                        
-[wW]"["[0-9]+","[0-9]+"]" { yylval.strPtr = (char *) strcpy(malloc(strlen(yytext)+1),yytext); 
+[wW]"["[0-9]+"]" { yylval.strPtr = (char *) strcpy(malloc(strlen(yytext)+1),yytext); 
                          return WINSTR; 
                        }
 [sS]"["[0-9]+","[0-9]+"]" { yylval.strPtr = (char *) strcpy(malloc(strlen(yytext)+1),yytext); 
@@ -53,14 +66,10 @@
 [nN]"["[0-9]+"]" { 
 						yytext[strlen(yytext)-1] = 0;
 						yylval.val = atoi(yytext + 2);
-                         return NLINE;
+                        return NLINE;
                        }
                        
-[wW]"["[0-9]+"]" { yytext[strlen(yytext)-1] = 0;
-						yylval.val = atoi(yytext + 2);
-                         return WLINE;
-                       }
-[sS]"["[0-9]+"]" { yytext[strlen(yytext)-1] = 0;
+[rR]"["[0-9]+"]" { yytext[strlen(yytext)-1] = 0;
 						yylval.val = atoi(yytext + 2);
                          return SLINE;
                        }
@@ -85,6 +94,6 @@
                          return LABEL; 
                        }
 [  \t\n]+               /* eat up whitespace */
-";"[^\n]+               /* comment */
+"#"[^\n]+               /* comment */
 .                      {}
 %%
